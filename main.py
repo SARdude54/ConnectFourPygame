@@ -6,21 +6,23 @@ pygame.init()
 
 clock = pygame.time.Clock()
 window = pygame.display.set_mode((900, 800))
+pygame.display.set_caption("Connect Four")
 
 running = True
 clicked = False
+turn = 1
+# TODO Work on who's turn it is
 
 COL = 7
 ROW = 6
+
+RADIUS = 38
 
 game_board = [[{
     "cord": [c, r],
     "pos_cord": [r * 100 + 150, c * 100 + 151],
     "value": 0
 } for r in range(0, ROW + 1)] for c in range(0, COL + 1)]
-#
-game_board[5][0]["value"] = 2
-game_board[4][0]["value"] = 2
 
 
 def draw_board(screen: pygame.Surface, board: list[list[dict]]):
@@ -37,11 +39,11 @@ def draw_board(screen: pygame.Surface, board: list[list[dict]]):
     for r in range(0, ROW):
         for c in range(0, COL):
             if board[r][c]["value"] == 0:
-                pygame.draw.circle(screen, (0, 0, 0), board[r][c]["pos_cord"], 38)
+                pygame.draw.circle(screen, (0, 0, 0), board[r][c]["pos_cord"], RADIUS)
             if board[r][c]["value"] == 1:
-                pygame.draw.circle(screen, (255, 0, 0), board[r][c]["pos_cord"], 38)
+                pygame.draw.circle(screen, (255, 0, 0), board[r][c]["pos_cord"], RADIUS)
             if board[r][c]["value"] == 2:
-                pygame.draw.circle(screen, (255, 255, 0), board[r][c]["pos_cord"], 38)
+                pygame.draw.circle(screen, (255, 255, 0), board[r][c]["pos_cord"], RADIUS)
 
 
 def get_available_positions(board: list[list[dict]]):
@@ -72,14 +74,28 @@ def get_available_positions(board: list[list[dict]]):
     return available_positions
 
 
+def get_col_clicked(x):
+    for c in range(0, COL):
+        if game_board[0][c]["pos_cord"][0] - RADIUS <= x <= game_board[0][c]["pos_cord"][0] + RADIUS:
+            return c
+
+
+def get_available_pos_col(col):
+    for r in range(ROW - 1, -1, -1):
+        if game_board[r][col]["value"] == 0:
+            return game_board[r][col]
+
+
 if __name__ == "__main__":
     while running:
         draw_board(window, game_board)
+        mx, my = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
 
             if event.type == MOUSEBUTTONDOWN:
                 clicked = True
+                print(get_available_pos_col(get_col_clicked(mx)))
 
             if event.type == MOUSEBUTTONUP:
                 clicked = False
